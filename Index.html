@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Landfill & Transfer Station Drop-Off</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<style>
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+    }
+
+    #mapContainer {
+        height: 150%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        overflow: auto; /* Add scrollbars if content overflows */
+    }
+
+    #addressInput {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 2px solid green;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    .white-box {
+        width: 90%;
+        max-width: 350px;
+        height: auto;
+        background-color: white;
+        padding: 15px;
+        box-sizing: border-box;
+        z-index: 999;
+        position: absolute;
+        top: 20px; /* Adjust top position as needed */
+        right: 20px; /* Adjust right position as needed */
+        border-radius: 10px; /* Rounded corners */
+    }
+    .transfer-details-box {
+        display: none;
+        margin-top: 5px;
+        background-color: #f0f0f0; /* Light grey background color */
+        padding: 10px; /* Optional: Add padding to the result box */
+        border-radius: 5px;/* Optional: Add rounded corners */
+    }
+    .arrow-submit,
+    .additional-btn {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    background-color: #355E3B;
+    color: white;
+    border: none; /* Remove border */
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Add box shadow */
+    /* Additional styles for h6 appearance */
+    font-size: 1em;
+    font-weight: bold;
+    text-align: center;
+    font-family: Vivaldi;
+}
+    .search-container {
+        display: flex;
+        flex-direction: column; /* Stack elements vertically */
+        align-items: center;
+        justify-content: center;
+
+    }
+    .result-box {
+        display: none; /* Initially hide the result box */
+        margin-top: 5px;
+        background-color: #f0f0f0; /* Light grey background color */
+        padding: 10px; /* Optional: Add padding to the result box */
+        border-radius: 5px; /* Optional: Add rounded corners */
+        margin-bottom: 10px;
+    }
+    #result-box p {
+        margin-bottom: 0;
+    }
+    #validationResult {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    display: none; /* Hide the element by default */
+    }
+    #enteredAddress,
+    #stationName {
+        color: #355E3B;
+        font-weight: bold;
+    }
+    .image-title-container {
+    display: flex;
+    align-items: center;
+    }
+    .image-title-container img {
+        margin-right: 10px; /* Adjust the margin as needed */
+    }
+    
+    .station-distance {
+    display: flex;
+    align-items: center;
+    }
+    .station-distance {
+        margin-right: 10px; /* Adjust the margin as needed */
+    }
+</style>
+</head>
+<body>
+    <div class="white-box" id="whiteBox">
+         <!-- Content inside the white box -->
+        <div class="search-container">
+            <div class="image-title-container">
+                <img src="file:///Users/meghajotangiya/Desktop/My%20Project/light-green-location-arrow-pin-icon.svg" alt="Image Description">
+                <h3 style="font-size: 23px; margin-top: 0; margin-bottom: 5px; color: #355E3B;">Find Drop-Off Location Near You</h3>
+            </div>
+            <input type="text" id="addressInput" name="addressInput" placeholder="3401 E Desert Cove Ave Phoenix AZ 85028" required>
+            <p id="validationResult" style="display: none;"></p>
+            <button class="arrow-submit" onclick="validateAddress()">Show Details</button>
+        </div>
+        <div class="result-box" id="resultBox">
+            <p id="enteredAddress" style="margin-top: 0; font-size: 16px;"></p>
+            <p id="serviceArea" style="margin-top: -10px;"></p>
+            <p id="collectionSchedule" style="margin-top: -10px; margin-bottom: 0;"></p>
+        </div>
+        <button class="additional-btn" onclick="showNearestStation()">Landfill/Transfer Station</button>
+        <!-- Transfer station details section -->
+        <div class="transfer-details-box" id="transferStationDetails">
+            <div class="station-distance">
+                <p id="stationName" style="margin-top: 0; font-size: 16px;"></p>
+                <p id="stationDistance" style="margin-top: 0;"></p>
+            </div>
+          <p id="stationAddress" style="margin-top: -10px; "></p>
+          <h5 style="font-family: Vivaldi; margin-top: 0; margin-bottom: 0; font-size: 16px; font-weight: bold;">Hours</h5>
+          <p id="stationHours" style="margin-top: 0; color: gray; "></p> <!-- Add this line for displaying hours -->
+          <h5 style="font-family: Vivaldi; margin-top: 0; margin-bottom: 0; font-size: 16px; font-weight: bold;">Holidays</h5>
+          <p id="stationHolidays" style="margin-top: 0; color: gray;"></p>
+          
+          <p id="stationDirection" style="margin-top: 0; margin-bottom: 0;"></p>
+        </div>
+      </div>
+      <div id="mapContainer"></div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src='https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js'></script>
+  <link href='https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css' rel='stylesheet' />
+
+
+  <script>
+    // Create new map with marker and tooltip
+    let map = L.map('mapContainer').setView([33.5987844812527,-112.077087523346], 10);
+
+    // Add a tile layer (OpenStreetMap tiles)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
+
+    // Load and add the GeoJSON boundary data to the map
+    var geojsonUrl = 'http://127.0.0.1:8080/City_Limit_Dark_Outline.geojson'; // Update the URL with your GeoJSON file URL
+    fetch(geojsonUrl)
+        .then(response => response.json())
+        .then(data => {
+            L.geoJSON(data, {
+                style: {
+                    color: 'green', // Adjust color if needed
+                    weight: 2, // Adjust line thickness if needed
+                    fillOpacity: 0,
+                    fillColor: 'none'
+
+                }
+            }).addTo(map);
+
+            // Fit the map to the GeoJSON boundary layer
+            map.fitBounds(L.geoJSON(data).getBounds());
+        })
+        .catch(error => {
+            console.error('Error fetching GeoJSON:', error);
+        });
+
+    let marker = null;
+    let stations = [
+    {
+        name: 'North Gateway Station',
+        address: '30205 N Black Canyon Hwy \n Phoenix AZ 85085',
+        lat: 33.7605925,
+        lon: -112.1163813,
+        hours: {
+            mondayToFriday: '5:30 a.m. to 5 p.m.',
+            saturday: '6 a.m. to 3 p.m.',
+            sunday: 'Closed'
+        },
+        holidays: [
+            "Martin Luther King Jr. Day",
+            "President's Day",
+            "Cesar Chavez Day",
+            "Memorial Day",
+            "Juneteenth",
+            "Independence Day",
+            "Labor Day",
+            "Indigenous Peoples’ Day",
+            "Veterans Day (observed by the City on November 10, 2023)",
+            "Thanksgiving and the day after",
+            "Christmas",
+            "New Year's",
+            "Christmas Eve - Open 6 a.m. - 12 p.m.",
+            "Regular hours on New Year's Eve"
+        ]
+    },
+    {
+        name: '27th Ave Station',
+        address: '3060 S 27th Ave \n Phoenix AZ 85009',
+        lat: 33.4169941,
+        lon: -112.1186168,
+        hours: {
+            mondayToFriday: '5:30 a.m. to 5 p.m.',
+            saturday: '6 a.m. to 3 p.m.',
+            sunday: 'Closed'
+        },
+        holidays: [
+            "Martin Luther King Jr. Day",
+            "President's Day",
+            "Cesar Chavez Day",
+            "Memorial Day",
+            "Juneteenth",
+            "Independence Day",
+            "Labor Day",
+            "Indigenous Peoples’ Day",
+            "Veterans Day (observed by the City on November 10, 2023)",
+            "Thanksgiving and the day after",
+            "Christmas",
+            "New Year's",
+            "Christmas Eve - Open 6 a.m. - 12 p.m.",
+            "Regular hours on New Year's Eve"
+        ]
+    },
+    {
+        name: '85 Landfill',
+        address: '28361 W Patterson Road \n Buckeye AZ 85326',
+        lat: 33.1890375,
+        lon: -112.6686124,
+        hours: {
+            mondayToFriday: '5:30 a.m. to 5 p.m.',
+            saturday: '6 a.m. to 3 p.m.',
+            sunday: 'Closed'
+        },
+        holidays: [
+            "Martin Luther King Jr. Day",
+            "President's Day",
+            "Cesar Chavez Day",
+            "Memorial Day",
+            "Juneteenth",
+            "Independence Day",
+            "Labor Day",
+            "Indigenous Peoples’ Day",
+            "Veterans Day (observed by the City on November 10, 2023)",
+            "Thanksgiving and the day after",
+            "Christmas",
+            "New Year's",
+            "Christmas Eve - Open 6 a.m. - 12 p.m.",
+            "Regular hours on New Year's Eve"
+        ]
+    }
+];
+async function validateAddress() {
+    const addressInput = document.getElementById('addressInput').value.trim().toLowerCase();
+
+    try {
+        const response = await fetch('http://127.0.0.1:8080/active-service-addresses.csv');
+        if (!response.ok) {
+            throw new Error('Failed to fetch CSV data.');
+        }
+        const csvData = await response.text();
+        const rows = csvData.split('\n');
+        const headers = rows[0].split(',').map(header => header.trim()); // Trim whitespace from headers
+        const addressIndex = headers.indexOf('Address');
+        const serviceAreaIndex = headers.indexOf('Service_Area');
+
+        let isValid = false;
+        let validatedAddress = '';
+        let serviceArea = '';
+
+        for (let i = 1; i < rows.length; i++) {
+            const rowData = rows[i].split(',').map(item => item.trim()); // Trim whitespace from row data
+            const address = rowData[addressIndex].toLowerCase();
+
+            if (address === addressInput) {
+                isValid = true;
+                validatedAddress = address;
+                serviceArea = rowData[serviceAreaIndex];
+                
+                document.getElementById('resultBox').style.display = 'block'; // Show the result box
+
+                const validationResult = document.getElementById('validationResult');
+                const enteredAddress = document.getElementById('enteredAddress');
+
+                enteredAddress.innerText = rowData[addressIndex]; // Display entered address
+                document.getElementById('serviceArea').innerHTML = 'Service Area: ' + serviceArea; // Display service area
+                document.getElementById('collectionSchedule').innerHTML = '<a href="https://www.phoenix.gov/publicworkssite/Documents/2024%20Bulk%20Trash%20Collection%20Schedule_English.pdf" target="_blank">Bulk-Trash Collection Day</a>';
+
+
+                // Fetch latitude and longitude using OpenStreetMap API
+                const osmResponse = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${validatedAddress}`);
+                if (!osmResponse.ok) {
+                    throw new Error('Failed to fetch latitude and longitude.');
+                }
+                const osmData = await osmResponse.json();
+                const { lat, lon } = osmData[0];
+
+                // Define the custom icon using L.icon
+                const customIcon = L.icon({
+                    iconUrl: 'file:///Users/meghajotangiya/Desktop/My%20Project/location-pin-user-dot-icon.svg', // Replace 'path_to_your_custom_icon.svg' with the actual path or URL to your SVG icon
+                    iconSize: [35, 35], // Adjust the size of the icon as needed
+                    iconAnchor: [16, 32] // Adjust the anchor point if necessary
+                });
+
+                if (map) {
+                    map.remove();
+                }
+
+                map = L.map('mapContainer').setView([33.5987844812527,-112.077087523346], 13);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
+                marker = L.marker([lat, lon], { icon: customIcon }).addTo(map);
+                marker.bindTooltip('<strong>Your Address: </strong>'+rowData[addressIndex]).openTooltip();
+
+                break;
+            }
+        }
+
+        if (!isValid) {
+            const validationResult = document.getElementById('validationResult');
+            validationResult.style.display = 'block';
+            validationResult.innerText = 'We could not find this address.';
+            validationResult.style.color = 'red';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+async function showNearestStation() {
+    const addressInput = document.getElementById('addressInput').value.trim().toLowerCase(); // Convert input to lowercase for case-insensitive comparison
+
+    try {
+        // Fetch latitude and longitude using OpenStreetMap API
+        const osmResponse = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${addressInput}`);
+        if (!osmResponse.ok) {
+            throw new Error('Failed to fetch latitude and longitude.');
+        }
+        const osmData = await osmResponse.json();
+        const { lat, lon } = osmData[0];
+
+        // Calculate distance to each station using Mapbox API
+        const distances = await Promise.all(stations.map(async (station) => {
+            const mapboxResponse = await fetch(`https://api.mapbox.com/directions/v5/mapbox/driving/${lon},${lat};${station.lon},${station.lat}?access_token=sk.eyJ1IjoibWpvdGFuZ2kiLCJhIjoiY2x1OG9najJ0MDEybzJqbXphcWIzeGRqaiJ9.ur-u4ZDc8gI_hrCk1teT5Q`);
+            if (!mapboxResponse.ok) {
+                throw new Error('Failed to calculate distance.');
+            }
+            const mapboxData = await mapboxResponse.json();
+            return mapboxData.routes[0].distance;
+        }));
+
+        // Find the station with the shortest distance
+        const nearestIndex = distances.indexOf(Math.min(...distances));
+        const nearestStation = stations[nearestIndex];
+
+        // Create new map only if it's not already initialized
+        if (!map) {
+            map = L.map('mapContainer').setView([33.5987844812527,-112.077087523346], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+        }
+
+        // Display the nearest station on the map
+        if (nearestStation) {
+            // Fetch route geometry using Mapbox Directions API and display on the map
+            const routeResponse = await fetch(`https://api.mapbox.com/directions/v5/mapbox/driving/${lon},${lat};${nearestStation.lon},${nearestStation.lat}?geometries=geojson&steps=true&access_token=sk.eyJ1IjoibWpvdGFuZ2kiLCJhIjoiY2x1OG9najJ0MDEybzJqbXphcWIzeGRqaiJ9.ur-u4ZDc8gI_hrCk1teT5Q`);
+            const routeData = await routeResponse.json();
+            const route = routeData.routes[0].geometry;
+
+            // Add the route to the map
+            L.geoJSON(route).addTo(map);
+
+            // Add marker for the nearest station
+            const stationMarker = L.marker([nearestStation.lat, nearestStation.lon]).addTo(map);
+            stationMarker.bindTooltip('<strong>Name: </strong>'+nearestStation.name + '<br>' + '<strong>Station Address: </strong>'+nearestStation.address).openTooltip();
+
+            // Convert distance from meters to miles
+            const distanceInMiles = distances[nearestIndex] * 0.000621371;
+
+            // Update transfer station details on the web page with distance in miles
+            document.getElementById('transferStationDetails').style.display = 'block';
+            document.getElementById('stationName').innerHTML = `
+                <span>${nearestStation.name}</span>
+                <span>${distanceInMiles.toFixed(2)}mi</span>
+            `;
+            document.getElementById('stationAddress').innerHTML = nearestStation.address ;
+            document.getElementById('stationHours').innerHTML = 'Monday-Friday: ' + nearestStation.hours.mondayToFriday + '<br>' +
+                                                      'Saturday: ' + nearestStation.hours.saturday + '<br>' +
+                                                      'Sunday: ' + nearestStation.hours.sunday;
+            document.getElementById('stationHolidays').innerHTML = nearestStation.holidays.join('<br>');
+            document.getElementById('stationDistance').innerHTML = '';
+
+
+
+            stationMarker.setIcon(L.icon({
+                iconUrl: 'file:///Users/meghajotangiya/Desktop/My%20Project/location-pin-trash.svg', // Provide the path to your custom marker image
+                iconSize: [35, 35],
+                iconAnchor: [16, 32]
+            }));
+
+            // Fetch direction using Mapbox Directions API and display it
+            const directionResponse = await fetch(`https://api.mapbox.com/directions/v5/mapbox/driving/${lon},${lat};${nearestStation.lon},${nearestStation.lat}?steps=true&access_token=sk.eyJ1IjoibWpvdGFuZ2kiLCJhIjoiY2x1OG9najJ0MDEybzJqbXphcWIzeGRqaiJ9.ur-u4ZDc8gI_hrCk1teT5Q`);
+            const directionData = await directionResponse.json();
+            const steps = directionData.routes[0].legs[0].steps;
+            const direction = steps.map(step => step.maneuver.instruction).join('\n');
+
+            document.getElementById('stationDirection').innerHTML = 'Direction: ' + direction;
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+// Function to update map container height based on white box height
+function updateMapContainerHeight() {
+    const whiteBoxHeight = document.getElementById('whiteBox').offsetHeight;
+    const webpageHeight = window.innerHeight;
+    const mapContainer = document.getElementById('mapContainer');
+
+    // Check if white box height exceeds webpage height
+    if (whiteBoxHeight > webpageHeight) {
+        mapContainer.style.height = `${whiteBoxHeight}px`;
+    } else {
+        mapContainer.style.height = 'auto'; // Set default height to fill remaining space
+    }
+
+    // Check if white box height exceeds webpage height and adjust white box size
+    const bodyHeight = document.body.offsetHeight;
+    if (whiteBoxHeight > bodyHeight) {
+        document.getElementById('whiteBox').style.height = `${bodyHeight}px`;
+    } else {
+        document.getElementById('whiteBox').style.height = 'auto'; // Set default height to auto
+    }
+}
+
+// Call the updateMapContainerHeight function when the window is resized or when the white box content changes
+window.addEventListener('resize', updateMapContainerHeight);
+document.addEventListener('DOMContentLoaded', updateMapContainerHeight); // Call when the DOM content is loaded
+
+// Call the updateMapContainerHeight function after any changes to the white box content
+function updateHeightAfterChanges() {
+    setTimeout(updateMapContainerHeight, 100); // Delay the function call to ensure the content changes are applied
+}
+
+</script>
+</body>
+</html>
