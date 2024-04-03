@@ -358,7 +358,7 @@ async function showNearestStation() {
 
         // Calculate distance to each station using Mapbox API
         const distances = await Promise.all(stations.map(async (station) => {
-            const mapboxResponse = await fetch(`https://api.mapbox.com/directions/v5/mapbox/driving/${lon},${lat};${station.lon},${station.lat}?access_token=sk.eyJ1IjoibWpvdGFuZ2kiLCJhIjoiY2x1OG9najJ0MDEybzJqbXphcWIzeGRqaiJ9.ur-u4ZDc8gI_hrCk1teT5Q`);
+            const mapboxResponse = await fetch(`https://api.mapbox.com/directions/v5/mapbox/driving/${lon},${lat};${station.lon},${station.lat}?access_token=YOUR API KEY`);
             if (!mapboxResponse.ok) {
                 throw new Error('Failed to calculate distance.');
             }
@@ -381,7 +381,7 @@ async function showNearestStation() {
         // Display the nearest station on the map
         if (nearestStation) {
             // Fetch route geometry using Mapbox Directions API and display on the map
-            const routeResponse = await fetch(`https://api.mapbox.com/directions/v5/mapbox/driving/${lon},${lat};${nearestStation.lon},${nearestStation.lat}?geometries=geojson&steps=true&access_token=sk.eyJ1IjoibWpvdGFuZ2kiLCJhIjoiY2x1OG9najJ0MDEybzJqbXphcWIzeGRqaiJ9.ur-u4ZDc8gI_hrCk1teT5Q`);
+            const routeResponse = await fetch(`https://api.mapbox.com/directions/v5/mapbox/driving/${lon},${lat};${nearestStation.lon},${nearestStation.lat}?geometries=geojson&steps=true&access_token=YOUR API KEY`);
             const routeData = await routeResponse.json();
             const route = routeData.routes[0].geometry;
 
@@ -417,7 +417,7 @@ async function showNearestStation() {
             }));
 
             // Fetch direction using Mapbox Directions API and display it
-            const directionResponse = await fetch(`https://api.mapbox.com/directions/v5/mapbox/driving/${lon},${lat};${nearestStation.lon},${nearestStation.lat}?steps=true&access_token=sk.eyJ1IjoibWpvdGFuZ2kiLCJhIjoiY2x1OG9najJ0MDEybzJqbXphcWIzeGRqaiJ9.ur-u4ZDc8gI_hrCk1teT5Q`);
+            const directionResponse = await fetch(`https://api.mapbox.com/directions/v5/mapbox/driving/${lon},${lat};${nearestStation.lon},${nearestStation.lat}?steps=true&access_token=YOUR API KEY`);
             const directionData = await directionResponse.json();
             const steps = directionData.routes[0].legs[0].steps;
             const direction = steps.map(step => step.maneuver.instruction).join('\n');
