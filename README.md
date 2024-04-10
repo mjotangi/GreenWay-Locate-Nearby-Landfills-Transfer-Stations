@@ -46,5 +46,28 @@ We have created a “Transfer_Station_Dataframe.csv” file which has landfills 
 
 We have used “City_Limit_Dark_Outline.geojson” file from https://mappingphoenix.opendata.arcgis.com/datasets/d4e1e600f9404d9ea104de8ac36b5724_0/explore to show boundary of Phoenix city area.
 
+### **3.Target Audiences**
+
+- Resident Homeowners
+- Business Owners
+- Communities
+- Landscapers
+- Waste Management Professionals
+
+### **4.Tools and Technologies**
+
+- Languages: Python,HTML,CSS,JavaScript
+- Tool: Visual Studio Code
+- API: OpenStreetMap API, MapBox Direction API
+
+## **Use Cases**
+
+- Any city resident can utilize this website when needing to transfer bulk trash.
+- Landscapers with substantial amounts of green or garden waste can directly bring it to one of the city's transfer stations.
+- Users can check their collection day; however, if they have a pile exceeding 20 cubic yards or containing more than 25 pounds of construction and demolition waste, it will not be collected. Instead, they must deliver it to the nearest transfer station.
+
+
+
+
 
 
