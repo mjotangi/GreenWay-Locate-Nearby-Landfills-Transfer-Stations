@@ -8,9 +8,15 @@
 
 ## **The "Green Way" project contributes to sustainability in several ways:**
 
-1. Efficient Waste Management: By helping users locate nearby landfills and transfer stations, leading to proper waste disposal which reduces pollution, minimizes the force on natural resources, and prevents environmental degradation.
-2. Reduces Carbon Footprint: The project minimizes carbon footprints by enabling easy access to waste facilities, reducing transportation distances, and lowering vehicle emissions, thus aiding climate change mitigation and fostering environmental sustainability.
-3. Supports Green Infrastructure: The project promotes green infrastructure adoption through interactive maps and geolocation services, showcasing digital tools that enhance waste management efficiency, reduce resource use, and foster sustainable urban development.
+### **1. Efficient Waste Management:**
+
+By helping users locate nearby landfills and transfer stations, leading to proper waste disposal which reduces pollution, minimizes the force on natural resources, and prevents environmental degradation.
+### **2. Reduces Carbon Footprint:**
+
+The project minimizes carbon footprints by enabling easy access to waste facilities, reducing transportation distances, and lowering vehicle emissions, thus aiding climate change mitigation and fostering environmental sustainability.
+### **3. Supports Green Infrastructure:**
+
+The project promotes green infrastructure adoption through interactive maps and geolocation services, showcasing digital tools that enhance waste management efficiency, reduce resource use, and foster sustainable urban development.
 
 
 ## **Project Planning**
