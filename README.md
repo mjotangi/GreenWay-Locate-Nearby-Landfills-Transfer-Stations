@@ -15,5 +15,15 @@
 
 ## **Project Planning**
 
+1. Scope and Objective:
+A web application named "Green Way" that helps users locate nearby landfills and transfer stations based on their address input within Phoenix city area. The key features and functionalities of the application include:
+A. User Address Validation: 	Users can input their address, and application validates the address against active_service_addresses.csv file to ensure its accuracy and eligibility.
+B. Location Display: Upon successful address validation, the application displays the entered address, service area information, a link to the bulk-trash collection schedule, and shows the user’s address with a custom marker icon on the map using the OpenStreetMap API.
+C. Distance Calculation: Utilize Mapbox Direction API to calculate the distance between the user's address and nearby stations to determine the nearest station.
+D. Nearest Station Search: Users can click on the "Landfill/Transfer Station" button to find the nearest station to their address. The application calculates the distance to each station, displays the nearest station, and shows the shortest driving route between them on the map.
+E. nDetailed Nearest Station Information: The application provides detailed information about the nearest station, including its name, address, operating hours, holidays, and directions. It also displays the distance in miles from the user's address to the station.
+F. Error Handling: Implement error handling mechanisms to handle unexpected errors during address validation, map loading, and API interactions to ensure smooth functionality.
+
+
 
 
