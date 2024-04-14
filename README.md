@@ -5,7 +5,8 @@
 - Sustainability is the practice of meeting current needs without compromising the ability of future generations to meet their own needs. This principle is crucial for several reasons, with one of the key aspects being environmental conservation.
 - When we talk about sustainability, we're emphasizing the importance of using resources efficiently and reducing waste. This approach plays a significant role in preserving natural resources like clean air, water, forests, and biodiversity. By managing resources responsibly, we can protect ecosystems and minimize the impact of climate change.
 
-<img width="1440" alt="image" src="https://github.com/mjotangi/GreenWay-Locate-Nearby-Landfills-Transfer-Stations/assets/146262756/5daec52f-571e-4a71-b676-387fc39d18f6">
+![The-Moral-Imperative-of-Responsible-Waste-Managements](https://github.com/mjotangi/GreenWay-Locate-Nearby-Landfills-Transfer-Stations/assets/146262756/a810040d-bea9-4609-8918-e71673b168a5)
+
 
 
 ## **The "Green Way" project contributes to sustainability in several ways:**
