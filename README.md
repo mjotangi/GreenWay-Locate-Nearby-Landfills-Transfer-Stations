@@ -42,11 +42,11 @@ Implement error handling mechanisms to handle unexpected errors during address v
 
 ### **2. Data Source**
 
-We have downloaded the dataset "Public_Works_Solid_Waste_Active_Service_Addresses.csv" from https://www.phoenixopendata.com/dataset/public-works-solid-waste-active-service-addresses/resource/fa1ff854-4b88-4b47-8909-4556efedd823.
+I have downloaded the dataset "Public_Works_Solid_Waste_Active_Service_Addresses.csv" from https://www.phoenixopendata.com/dataset/public-works-solid-waste-active-service-addresses/resource/fa1ff854-4b88-4b47-8909-4556efedd823.
 
-We have created a “Transfer_Station_Dataframe.csv” file which has landfills & transfer stations of Phoenix city.
+I have created a “Transfer_Station_Dataframe.csv” file which has landfills & transfer stations of Phoenix city.
 
-We have used “City_Limit_Dark_Outline.geojson” file from https://mappingphoenix.opendata.arcgis.com/datasets/d4e1e600f9404d9ea104de8ac36b5724_0/explore to show boundary of Phoenix city area.
+I have used “City_Limit_Dark_Outline.geojson” file from https://mappingphoenix.opendata.arcgis.com/datasets/d4e1e600f9404d9ea104de8ac36b5724_0/explore to show boundary of Phoenix city area.
 
 ### **3.Target Audiences**
 
