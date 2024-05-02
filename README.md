@@ -76,9 +76,9 @@ I have used the MapBox Direction API to calculate distance and show the route on
 - Waste Management Professionals
 
 ### **Tools and Technologies**
-Languages: Python, HTML, CSS, JavaScript
-Tool: Visual Studio Code
-API: OpenStreetMap API, MapBox Direction API
+- Languages: Python, HTML, CSS, JavaScript
+- Tool: Visual Studio Code
+- API: OpenStreetMap API, MapBox Direction API
 
 
 
